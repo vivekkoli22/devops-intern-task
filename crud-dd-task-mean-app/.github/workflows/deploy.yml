@@ -49,9 +49,9 @@ jobs:
             git clone https://github.com/${{ github.repository }}.git mean-stack-task
             cd mean-stack-task
           fi
-
-          # Update images to use Docker Hub
+          
+          # Replace build with image from docker hub
           sed -i 's|build: ./backend|image: ${{ secrets.DOCKER_USERNAME }}/mean-backend:latest|g' docker-compose.yml
           sed -i 's|build: ./frontend|image: ${{ secrets.DOCKER_USERNAME }}/mean-frontend:latest|g' docker-compose.yml
           
-          sudo docker-compose up -d --build
+          sudo docker-compose up -d
