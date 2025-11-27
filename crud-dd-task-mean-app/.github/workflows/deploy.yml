@@ -39,22 +39,8 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # Stop old containers
           sudo docker-compose down || true
-          
-          # Remove old images to save space
           sudo docker system prune -af || true
-          
-          # Create fresh directory for config
-          mkdir -p ~/app
-          
-          # Pull latest images
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/mean-backend:latest
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/mean-frontend:latest
-          
-          # We need to recreate docker-compose.yml on server because we are not copying files, just pulling images
-          # But for simplicity, let's clone/pull the repo or just run containers manually.
-          # Best method for simple task: Git Pull then Up
           
           if [ -d "mean-stack-task" ]; then
             cd mean-stack-task
@@ -64,10 +50,8 @@ jobs:
             cd mean-stack-task
           fi
 
-          # Update images in compose file to use Docker Hub instead of local build
-          # (This is a quick hack for the assignment)
+          # Update images to use Docker Hub
           sed -i 's|build: ./backend|image: ${{ secrets.DOCKER_USERNAME }}/mean-backend:latest|g' docker-compose.yml
           sed -i 's|build: ./frontend|image: ${{ secrets.DOCKER_USERNAME }}/mean-frontend:latest|g' docker-compose.yml
           
-          # Start everything
           sudo docker-compose up -d --build
