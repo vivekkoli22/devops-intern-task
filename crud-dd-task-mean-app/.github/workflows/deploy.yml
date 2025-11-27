@@ -1,0 +1,73 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Push Backend
+      uses: docker/build-push-action@v2
+      with:
+        context: ./backend
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/mean-backend:latest
+
+    - name: Build and Push Frontend
+      uses: docker/build-push-action@v2
+      with:
+        context: ./frontend
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/mean-frontend:latest
+
+    - name: Deploy to AWS EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_DNS }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # Stop old containers
+          sudo docker-compose down || true
+          
+          # Remove old images to save space
+          sudo docker system prune -af || true
+          
+          # Create fresh directory for config
+          mkdir -p ~/app
+          
+          # Pull latest images
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/mean-backend:latest
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/mean-frontend:latest
+          
+          # We need to recreate docker-compose.yml on server because we are not copying files, just pulling images
+          # But for simplicity, let's clone/pull the repo or just run containers manually.
+          # Best method for simple task: Git Pull then Up
+          
+          if [ -d "mean-stack-task" ]; then
+            cd mean-stack-task
+            git pull origin main
+          else
+            git clone https://github.com/${{ github.repository }}.git mean-stack-task
+            cd mean-stack-task
+          fi
+
+          # Update images in compose file to use Docker Hub instead of local build
+          # (This is a quick hack for the assignment)
+          sed -i 's|build: ./backend|image: ${{ secrets.DOCKER_USERNAME }}/mean-backend:latest|g' docker-compose.yml
+          sed -i 's|build: ./frontend|image: ${{ secrets.DOCKER_USERNAME }}/mean-frontend:latest|g' docker-compose.yml
+          
+          # Start everything
+          sudo docker-compose up -d --build

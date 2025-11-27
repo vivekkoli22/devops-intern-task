@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Database
   mongo:
     image: mongo:latest
     container_name: mean-mongo
@@ -10,25 +9,33 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  # Backend API
   backend:
     build: ./backend
     container_name: mean-backend
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     depends_on:
       - mongo
     environment:
       - MONGO_URI=mongodb://mongo:27017/mean-db
-      # Yahan humne bata diya ki DB ka naam 'mongo' hai, localhost nahi.
+    restart: always
 
-  # Frontend UI
   frontend:
     build: ./frontend
     container_name: mean-frontend
+    expose:
+      - "80"
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    container_name: mean-nginx
     ports:
       - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
+      - frontend
       - backend
 
 volumes:
