@@ -12,27 +12,25 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # Ye step humein dikhayega ki files kahan hain
-    - name: List Files (Debug)
-      run: ls -R
-
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    # CHANGE 1: Context path me folder ka naam add kiya
     - name: Build and Push Backend
       uses: docker/build-push-action@v5
       with:
-        context: ./backend
+        context: ./crud-dd-task-mean-app/backend
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/mean-backend:latest
 
+    # CHANGE 2: Frontend ke liye bhi folder ka naam add kiya
     - name: Build and Push Frontend
       uses: docker/build-push-action@v5
       with:
-        context: ./frontend
+        context: ./crud-dd-task-mean-app/frontend
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/mean-frontend:latest
 
@@ -43,9 +41,11 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          sudo docker-compose down || true
+          # Stop any running containers
+          sudo docker ps -q | xargs -r sudo docker stop
           sudo docker system prune -af || true
           
+          # Folder structure handle karna
           if [ -d "mean-stack-task" ]; then
             cd mean-stack-task
             git pull origin main
@@ -54,8 +54,12 @@ jobs:
             cd mean-stack-task
           fi
           
-          # Use images from Docker Hub
+          # CHANGE 3: Ab hum us folder ke andar jayenge jahan docker-compose.yml hai
+          cd crud-dd-task-mean-app
+
+          # Update images to use Docker Hub
           sed -i 's|build: ./backend|image: ${{ secrets.DOCKER_USERNAME }}/mean-backend:latest|g' docker-compose.yml
           sed -i 's|build: ./frontend|image: ${{ secrets.DOCKER_USERNAME }}/mean-frontend:latest|g' docker-compose.yml
           
+          # Start the app
           sudo docker-compose up -d
