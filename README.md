@@ -36,18 +36,3 @@ cd crud-dd-task-mean-app
 
 # Run with Docker Compose
 docker-compose up -d
-
-
-## 📸 Project Screenshots
-
-### 1. Application Running on AWS EC2
-![Website Preview](./screenshots/website.png)
-
-### 2. GitHub Actions CI/CD Success
-![CI/CD Success](./screenshots/action-green.png)
-
-### 3. Docker Hub Repository (Images Pushed)
-![Docker Hub](./screenshots/dockerhub.png)
-
-### 4. Terminal Output (Containers Running)
-![Terminal Output](./screenshots/terminal.png)
