@@ -1,28 +1,53 @@
-In this DevOps task, you need to build and deploy a full-stack CRUD application using the MEAN stack (MongoDB, Express, Angular 15, and Node.js). The backend will be developed with Node.js and Express to provide REST APIs, connecting to a MongoDB database. The frontend will be an Angular application utilizing HTTPClient for communication.  
 
-The application will manage a collection of tutorials, where each tutorial includes an ID, title, description, and published status. Users will be able to create, retrieve, update, and delete tutorials. Additionally, a search box will allow users to find tutorials by title.
+# MEAN Stack Application with DevOps Automation
 
-## Project setup
+This repository contains a Full Stack MEAN (MongoDB, Express, Angular, Node.js) application containerized with Docker and deployed to AWS EC2 using a CI/CD pipeline via GitHub Actions.
 
-### Node.js Server
+## 🚀 Project Overview
+- **Frontend:** Angular
+- **Backend:** Node.js & Express
+- **Database:** MongoDB
+- **Proxy:** Nginx (Reverse Proxy)
+- **Containerization:** Docker & Docker Compose
+- **CI/CD:** GitHub Actions
+- **Deployment:** AWS EC2 (Ubuntu)
 
-cd backend
+## 🛠️ Architecture
+1. **Docker:** Both Frontend and Backend are containerized using Multi-stage builds.
+2. **Nginx:** Configured as a reverse proxy to route traffic to Frontend (Port 80) and Backend API (Port 3000).
+3. **CI/CD Pipeline:**
+   - **Build:** Automatically builds Docker images on `git push`.
+   - **Push:** Pushes images to Docker Hub.
+   - **Deploy:** Connects to AWS EC2 via SSH, pulls the latest images, and updates the running containers using Docker Compose.
 
-npm install
+## ⚙️ Setup & Deployment Steps
 
-You can update the MongoDB credentials by modifying the `db.config.js` file located in `app/config/`.
+### Prerequisites
+- Docker & Docker Compose installed on the server.
+- AWS EC2 Instance (Ubuntu) with Ports 80, 3000, and 22 open.
 
-Run `node server.js`
+### Local Installation
+```bash
+# Clone the repository
+git clone <https://github.com/vivekkoli22/devops-intern-task.git>
 
-### Angular Client
+# Navigate to directory
+cd crud-dd-task-mean-app
 
-cd frontend
+# Run with Docker Compose
+docker-compose up -d
 
-npm install
 
-Run `ng serve --port 8081`
+## 📸 Project Screenshots
 
-You can modify the `src/app/services/tutorial.service.ts` file to adjust how the frontend interacts with the backend.
+### 1. Application Running on AWS EC2
+![Website Preview](./screenshots/website.png)
 
-Navigate to `http://localhost:8081/`
-"Testing GitHub Actions"
+### 2. GitHub Actions CI/CD Success
+![CI/CD Success](./screenshots/action-green.png)
+
+### 3. Docker Hub Repository (Images Pushed)
+![Docker Hub](./screenshots/dockerhub.png)
+
+### 4. Terminal Output (Containers Running)
+![Terminal Output](./screenshots/terminal.png)
