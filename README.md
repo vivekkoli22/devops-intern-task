@@ -29,7 +29,7 @@ This repository contains a Full Stack MEAN (MongoDB, Express, Angular, Node.js) 
 ### Local Installation
 ```bash
 # Clone the repository
-git clone <YOUR_REPO_URL>
+git clone <https://github.com/vivekkoli22/devops-intern-task.git>
 
 # Navigate to directory
 cd crud-dd-task-mean-app
